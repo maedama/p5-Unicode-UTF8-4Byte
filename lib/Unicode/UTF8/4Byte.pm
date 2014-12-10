@@ -29,7 +29,16 @@ sub escape_4byte_utf8_chars {
 
 sub unescape_4byte_utf8_chars {
     my $str = shift;
-    $str =~ s/\\x\{([A-Za-z0-9]+)\}/chr(hex($1))/ge;
+    $str =~ s/\\x\{([A-Fa-f0-9]+)\}/
+        my $hex = $1;
+
+        if (length($hex) <= 8 ) { # 32bits
+            chr(hex($1))
+        }
+        else {
+            $&
+        }
+    /ge;
     return $str;
 }
 

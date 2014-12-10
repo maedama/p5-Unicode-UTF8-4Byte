@@ -25,5 +25,20 @@ subtest "round trip" => sub {
     is decode("utf8-4byte-escaped", encode("utf8-4byte-escaped", $str_without_4byte_utf8_char)), $str_without_4byte_utf8_char;
     is decode("utf8-4byte-escaped", encode("utf8-4byte-escaped", $str_without_4byte_utf8_char)), $str_without_4byte_utf8_char;
 };
+
+subtest "out or range code point not unescaped" => sub {
+    my @invalid_letters = qw/
+        \x{00000000000000000000000000000000000000000}
+        \x{99999999999999999999999999999999999999999}
+    /;
+    for my $letter (@invalid_letters) {
+        is decode("utf8-4byte-escaped", $letter), $letter, $letter;
+    }
+};
+
+subtest 'invalid code point' => sub {
+    is decode("utf8-4byte-escaped", '\x{d83f}'), "\x{d83f}";
+    is decode("utf8-4byte-escaped", '\x{ffffffff}'), "\x{ffffffff}";
+};
 done_testing;
 
